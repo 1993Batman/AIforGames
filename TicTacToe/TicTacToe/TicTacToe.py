@@ -22,6 +22,7 @@ Want OO? There's another version of this code. Same functions, nice class.
 '''
 
 import time
+import random
 
 # static game data - doesn't change (hence immutable tuple data type)
 WIN_SET = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), 
@@ -31,7 +32,7 @@ WIN_SET = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6),
 board = [' '] * 9
 current_player = '' # 'x' or 'o' for first and second player
 
-players = {'x': 'Human', 'o': 'Super AI' }
+players = {'x': 'Super AI', 'o': 'AI' }
 winner = None
 move = None
 
@@ -53,11 +54,13 @@ def check_move():
         if board[move] == ' ':
             return True
         else:
-            print ('>> Sorry - that position is already taken!')
-            return False
+             if players['x'] is "human":
+                print ('>> Sorry - that position is already taken!')
+             return False
     except:
-        print ('>> %s is not a valid position! Must be int between 0 and 8.' % move)
-        return False
+       if players['x'] is "human":
+           print ('>> %s is not a valid position! Must be int between 0 and 8.' % move)
+       return False
     
     
 def check_for_result():
@@ -83,19 +86,23 @@ def get_human_move():
     '''Get a human players raw input. Returns None if a number is not entered.'''
     return input('[0-8] >> ')
 
-
 def get_ai_move():
+    '''Get the AI's next move '''
+    return random.randrange(9)
+def get_super_ai_move():
     '''Get the AI's next move '''
     global move
     
     BEST_MOVES = (4, 0, 2, 6, 8, 1, 3, 5, 7) 
-    #checks to see if the ai can win
+    #checks to see if other player can win and blocks
     if move is not None:
         for move in board[move]:
             if check_for_result() != None :
                 return move
 
     for move in BEST_MOVES:
+        if check_for_result() != None :
+            return move
         if check_move() != False:
             return move
 
@@ -107,7 +114,7 @@ def process_input():
     # save the next move into a global variable
     global move
     if current_player == 'x':
-        move = get_ai_move()
+        move = get_super_ai_move()
     else:
         move = get_ai_move()
         
@@ -132,7 +139,8 @@ def update_model():
         else:
             current_player = 'x'
     else:
-        print ('Try again')
+        if players['x'] is "human":
+            print ('Try again')
     
 
 def render_board():
@@ -192,9 +200,15 @@ if __name__ == '__main__':
     render_board()
     
     # Standard game loop structure
-    while winner is None:
-        process_input()
-        update_model()
+    if players['x'] is "human":
+        while winner is None:
+            process_input()
+            update_model()
+            render_board()
+    else:
+        while winner is None:
+            process_input()
+            update_model()
         render_board()
 
     # Some pretty messages for the result
