@@ -32,7 +32,7 @@ WIN_SET = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6),
 board = [' '] * 9
 current_player = '' # 'x' or 'o' for first and second player
 
-players = {'x': 'Super AI', 'o': 'AI' }
+players = {'x': 'Super AI', 'o': 'Super AI' }
 winner = None
 move = None
 
@@ -89,6 +89,7 @@ def get_human_move():
 def get_ai_move():
     '''Get the AI's next move '''
     return random.randrange(9)
+
 def get_super_ai_move():
     '''Get the AI's next move '''
     global move
