@@ -22,13 +22,12 @@ Notes:
 * This version is simply based on dictionaries and functions.
 
 '''
-
 VERBOSE = True
 
 # Global goals with initial values
 goals = {
-    'Eat': 7,
-    'Sleep': 5,
+    'Eat': 13,
+    'Sleep': 11,
 }
 
 # Global (read-only) actions and effects
@@ -40,14 +39,21 @@ actions = {
     
 }
 
-
 def apply_action(action):
     '''Change all goal values using this action. An action can change multiple
     goals (positive and negative side effects).
     Negative changes are limited to a minimum goal value of 0.
     '''
+    #opp_goal = None
+
+
     for goal, change in list(actions[action].items()):
+        #if goal is 'Eat':
+            #opp_goal = 'Sleep'
+        #else:
+            #opp_goal = 'Eat'
         goals[goal] = max(goals[goal] + change, 0)
+        #goals[opp_goal] = max(goals[opp_goal] - (change/2), 0)
 
 
 def action_utility(action, goal):
@@ -64,6 +70,8 @@ def action_utility(action, goal):
 
     if goal in actions[action]:
         # Is the goal affected by the specified action?
+
+        +actions[action][goal]
         return -actions[action][goal]
     else:
         # It isn't, so utility is zero.
@@ -109,30 +117,22 @@ def choose_action():
             # Do we currently have a "best action" to try? If not, use this one
             if best_action is None:
                 ### 1. store the "key" as the current best_action
-                ### ...
                 ### 2. use the "action_utility" function to find the best_utility value of this best_action
-                ### ...
                     best_action = key
-                    #best_utility = value
                     print(key)
                     print(value)
-                    #test = action_utility(key, value)
             # Is this new action better than the current action?
             else: 
                 ### 1. use the "action_utility" function to find the utility value of this action
-                ### ...
                 ### 2. If it's the best action to take (utility > best_utility), keep it! (utility and action)    
-                ### ... 
-                #test2 = action_utility(key, value)      
-                #print(test2)   
                 print(key)
                 print(value)      
                 if action_utility(key,best_goal) > action_utility(best_action,best_goal):
-                    if (best_goal_value - action_utility(key,best_goal)) > 0:
+                    if goals[best_goal] - action_utility(key, best_goal) <= 0:
+                        return best_action
+                    else:
                         best_action = key
-                    if (best_goal_value - action_utility(key,best_goal)) < 0 and (best_goal_value - action_utility(best_action,best_goal)) < 0:
-                        if (action_utility(key,best_goal) < action_utility(best_action,best_goal)):
-                            best_action = key
+                    
     # Return the "best action"
     return best_action
 
