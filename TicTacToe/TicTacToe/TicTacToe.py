@@ -117,7 +117,7 @@ def process_input():
     if current_player == 'x':
         move = get_super_ai_move()
     else:
-        move = get_ai_move()
+        move = get_super_ai_move()
         
 
 
