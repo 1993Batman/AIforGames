@@ -16,7 +16,7 @@ from hidingspots import HidingSpots
 
 AGENT_MODES = {
     KEY._1: 'seek',
-    KEY._6: 'hide'
+    KEY._2: 'hide'
 }
 
 

@@ -15,7 +15,7 @@ from tkinter import Scale
 
 AGENT_MODES = {
     KEY._1: 'seek',
-    KEY._6: 'hide',
+    KEY._2: 'hide',
 }
 
 
