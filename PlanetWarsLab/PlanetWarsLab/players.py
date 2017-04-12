@@ -109,6 +109,7 @@ class Player(object):
         # Assumes gameinfo facade details are ready - let the bot issue orders!
         # Note: the bot controller has a reference to our *_order methods.
         self.controller.update(self.gameinfo)
+        
 
     def is_alive(self):
         return self.num_ships > 0
@@ -119,7 +120,12 @@ class Player(object):
             if it is done, but no guarantee - the game decides and enforces the rules.
         '''
         # If source fleet splitting we'll need a new fleet_id else keep old one
-        fleetid = uuid.uuid4() if num_ships < src_fleet.num_ships else src_fleet.id
+        print(src_fleet.id)
+        
+        if num_ships < src_fleet.num_ships: 
+            fleetid = uuid.uuid4() 
+            print(fleetid)
+        
         self.orders.append(('fleet', src_fleet.id, fleetid, num_ships, dest.id))
         return fleetid
 

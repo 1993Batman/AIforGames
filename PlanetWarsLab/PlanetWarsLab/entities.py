@@ -115,7 +115,7 @@ class Fleet(Entity):
     # the size of the fleet will add some vision range
     # with the formula: totalrange = FLEET_RANGE + (fleet.num_ships * FLEET_FACTOR)
     # todo remove FLEET_FACTOR?
-    FLEET_FACTOR = 0
+    FLEET_FACTOR = 1
 
     def __init__(self, id, owner_id, num_ships, src, dest, progress=0):
         super(Fleet, self).__init__(src.x, src.y, id, owner_id, num_ships)
@@ -127,10 +127,12 @@ class Fleet(Entity):
         self.turns_remaining = self.total_trip_length - progress
         self.progress = 0
 
-    def in_range(self, entities, ignoredest=True):
+    def in_range(self, entities, ignoredest=False):
         result = super(Fleet, self).in_range(entities)
+        
         if (not ignoredest) and (self.turns_remaining == 1) and (self.dest not in result):
             result.append(self.dest)
+            print("working:", result[0].id)
         return result
 
     def vision_range(self):

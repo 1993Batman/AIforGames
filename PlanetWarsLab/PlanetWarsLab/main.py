@@ -49,7 +49,7 @@ SCREEN_SIZE = (3 * GAME_SIZE[0], GAME_SIZE[1])
 COLOR = {
     0: COLOR_NAMES['LIGHT_GREY'],
     1: COLOR_NAMES['LIGHT_RED'],  # (255, 0, 0), # red
-    2: COLOR_NAMES['LIGHT_BLUE'],  # (0, 0, 255), # blue
+    2: COLOR_NAMES['BROWN'],  # (0, 0, 255), # blue
     3: COLOR_NAMES['LIGHT_GREEN'],  # (0, 255, 0), # green
 }
 
@@ -344,8 +344,8 @@ class PlanetWarsWindow(window.Window):
 
 
 if __name__ == '__main__':
-    gamestate = open('./maps/map37.txt').read()
-    players = ['AttackSmallPlanetOnly', 'AttackMaxPlanetOnly']
+    gamestate = open('./maps/map12.txt').read()
+    players = ['AttackSmallPlanetOnly', 'Spike11']
     window = PlanetWarsWindow(gamestate=gamestate, players=players, max_game_length=500)
     app.run()
     window.game.logger.flush()

@@ -70,7 +70,7 @@ class BoxWorldWindow(pyglet.window.Window):
         self.add_handers()
 
         # search limit
-        self.limit = 0 # unlimited.
+        self.limit = 15 # unlimited.
 
     def _update_label(self, key=None, text='---'):
         if key == 'mouse' or key is None:
@@ -149,7 +149,7 @@ class BoxWorldWindow(pyglet.window.Window):
                 self.plan_path()
                 self._update_label('status', 'limit=%d' % self.limit)
             elif symbol == key.DOWN:
-                if self.limit-1 > 0:
+                if self.limit-1 > 5:
                     self.limit -= 1
                     self.plan_path()
                     self._update_label('status', 'limit=%d' % self.limit)
@@ -180,7 +180,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         filename = sys.argv[1]
     else:
-        filename = "map1.txt"
+        filename = "map3.txt"
     window = BoxWorldWindow(filename)
     pyglet.app.run()
 

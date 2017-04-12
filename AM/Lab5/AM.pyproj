@@ -3,15 +3,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>7d3ae34e-98b0-4bfa-b75b-3a7ac96c639c</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
+    <ProjectGuid>096dc2eb-ee05-4b3d-899d-8eabc2fe6869</ProjectGuid>
+    <ProjectHome>
+    </ProjectHome>
     <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>PlanetWarsLab</Name>
-    <RootNamespace>PlanetWarsLab</RootNamespace>
+    <Name>AM</Name>
+    <RootNamespace>Lab5</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,31 +23,34 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="bots\AttackMaxPlanetOnly.py">
+    <Compile Include="agent.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="bots\AttackSmallPlanetOnly.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="bots\Spike11.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="entities.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="logger.py">
+    <Compile Include="graphics.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py" />
-    <Compile Include="planet_wars.py">
+    <Compile Include="matrix33.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="players.py">
+    <Compile Include="path.py">
       <SubType>Code</SubType>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bots\" />
+    <Compile Include="point2d.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="target.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="vector2d.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="weapon.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="world.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

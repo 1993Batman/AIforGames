@@ -185,7 +185,7 @@ def SearchDijkstra(graph, source_idx, target_idx, limit=0):
     # return the partial/complete path details
     return Path(graph, route, target_idx, open, closed, steps)
 
-def SearchAStar(graph, source_idx, target_idx, limit=0):
+def SearchAStar(graph, source_idx, target_idx, limit):
     ''' A* Search. Expand the minimum path cost-so-far + lowest heuristic cost. '''
     closed = set() # set - of visited nodes
     route = {} # dict of {to:from} items to find our way home
