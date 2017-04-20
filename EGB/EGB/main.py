@@ -11,7 +11,6 @@ from vector2d import Vector2D
 from world import World
 from agent import Agent, AGENT_MODES  # Agent with seek, arrive, flee and pursuit
 
-
 def on_mouse_press(x, y, button, modifiers):
     if button == 1:  # left
         world.target = Vector2D(x, y)
@@ -26,21 +25,21 @@ def on_key_press(symbol, modifiers):
     elif symbol == KEY.A:
         world.agents.append(Agent(world))
     elif symbol == KEY.Q:
-        world.seperation += 10.00
+        world.seperation += 0.10
     elif symbol == KEY.W:
-        world.seperation -= 10.00
+        world.seperation -= 0.10
     elif symbol == KEY.E:
-        world.cohesion += 10.00
+        world.cohesion += 0.10
     elif symbol == KEY.R:
-        world.cohesion -= 10.00
+        world.cohesion -= 0.10
     elif symbol == KEY.T:
-        world.alignmnet += 10.00
+        world.alignmnet += 0.10
     elif symbol == KEY.Y:
-        world.alignmnet -= 10.00            
+        world.alignmnet -= 0.10            
     elif symbol == KEY.U:
-        world.radius += 10.00
+        world.radius += 0.10
     elif symbol == KEY.I:
-        world.radius -= 10.00 
+        world.radius -= 0.10 
     elif symbol == KEY.O:
         world.cohesion = 0.00
         world.alignmnet = 0.00
@@ -75,6 +74,22 @@ if __name__ == '__main__':
     # create a world for agents
     world = World(500, 500)
     # add one agent
+    i = 0
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
+    world.agents.append(Agent(world))
     world.agents.append(Agent(world))
     # unpause the world ready for movement
     world.paused = False

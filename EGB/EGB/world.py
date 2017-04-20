@@ -14,7 +14,7 @@ class World(object):
         self.cx = cx
         self.cy = cy
         self.target = Vector2D(cx / 2, cy / 2)
-        self.hunter = None
+        self.shark = []
         self.agents = []
         self.paused = True
         self.show_info = True
@@ -27,10 +27,14 @@ class World(object):
         if not self.paused:
             for agent in self.agents:
                 agent.update(delta)
+            for shark in self.shark:
+                shark.update(delta)
 
     def render(self):
         for agent in self.agents:
             agent.render()
+        for shark in self.shark:
+            shark.render()
 
         if self.target:
             egi.red_pen()

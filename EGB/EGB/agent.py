@@ -14,8 +14,7 @@ from tkinter import Scale
 from _operator import pos
 
 AGENT_MODES = {
-    KEY._1: 'seek',
-    KEY._2: 'neighbourhood',
+    KEY._1: 'neighbourhood',
 }
 
 class Agent(object):
@@ -27,7 +26,7 @@ class Agent(object):
         'fast': 0.2
     }
 
-    def __init__(self, world=None, scale=30.0, mass=1.0, mode='seek'):
+    def __init__(self, world=None, scale=10.0, mass=1.5, mode='neighbourhood'):
         # keep a reference to the world object
         self.world = world
         self.mode = mode
@@ -46,16 +45,16 @@ class Agent(object):
         # data for drawing this agent
         self.color = 'ORANGE'
         self.vehicle_shape = [
-            Point2D(-1.0,  0.6),
-            Point2D( 1.0,  0.0),
-            Point2D(-1.0, -0.6)
+            Point2D(-0.5,  0.25),
+            Point2D( 0.5,  -0.3),
+            Point2D(-0.5, -0.25)
         ]
         
         ### wander details
         self.wander_target = Vector2D(1,0)
-        self.wander_dist =1.0 * scale
-        self.wander_radius =1.0 * scale
-        self.wander_jitter =10.0 * scale
+        self.wander_dist =5.0 * scale
+        self.wander_radius =3.0 * scale
+        self.wander_jitter =1.0 * scale
         self.bRadius =scale
             
 
@@ -67,14 +66,14 @@ class Agent(object):
 
         # debug draw info?
         self.show_info = False
+        
 
     def calculate(self,delta):
         # calculate the current steering force
         mode = self.mode
-        if mode == 'seek':
-            force = self.seek(self.world.target)
-        elif mode == 'neighbourhood':
-            self.neighbours(self.world.agents)
+        if self.tagged is False:
+            self.neighbours(self.world.agents, self.world.radius)
+        if mode == 'neighbourhood':
             force= self.wander(delta)
             force +=self.alignment(self.world.agents) * self.world.alignmnet
             force +=self.cohesion(self.world.agents) * self.world.cohesion
@@ -127,11 +126,6 @@ class Agent(object):
             if self.tagged == False:
                 self.color = 'ORANGE'
             pass
-        if self.mode != 'neighbourhood':
-            if self.tagged == True:
-                self.color = 'ORANGE'
-                self.tagged = False
-            pass
 
         # add some handy debug drawing info lines - force and velocity
         if self.show_info:
@@ -165,7 +159,7 @@ class Agent(object):
         # this behaviour is dependent on the update rate, so this line must
         # be included when using time independent framerate.
         #jitter_tts = self.wander_jitter * delta  this time slice
-        jitter_tts  = 1
+        jitter_tts  = self.wander_jitter * delta
         # first, add a small random vector to the target's position
         wt += Vector2D(uniform(-1,1) * jitter_tts, uniform(-1,1) * jitter_tts)
         # re-project this new vector back on to a unit circle
@@ -181,26 +175,23 @@ class Agent(object):
         return self.seek(wld_target) 
     
 
-    def neighbours(self,bots):
-        
-        for agent in bots:
-            self.tagged = False
-            
-            to = self.pos - agent.pos
-        
-            gap = self.world.radius + self.bRadius
-            
+    def neighbours(self,bots,radius):
+        for bot in bots:
+            # untag all first
+            bot.tagged = False
+            # get the vector between us
+            to = self.pos - bot.pos
+            # take into account the bounding radius
+            gap = radius + bot.bRadius
             if to.length_sq() < gap**2:
-                self.tagged = True
+                bot.tagged = True
     
     def separation(self,group):
         steering_force = Vector2D()
         for agent in group:
             if self != agent and self.tagged:
-                toBot =self.pos - agent.pos
-                
-                steering_force += Vector2D.normalise(toBot) / toBot.length()
-                
+                toBot =self.pos - agent.pos         
+                steering_force += Vector2D.normalise(toBot) / toBot.length()             
         return steering_force
     
     def alignment(self,group):
@@ -212,9 +203,9 @@ class Agent(object):
                 avgHeading += agent.pos
                 avgCount += 1
                 
-            if avgCount > 0:
-                avgHeading /= float(avgCount)
-                avgHeading -= agent.heading
+        if avgCount > 0:
+            avgHeading /= float(avgCount)
+            avgHeading -= self.heading
         return avgHeading
     
     def cohesion(self, group):
@@ -227,8 +218,8 @@ class Agent(object):
                 centerMass += agent.pos
                 avgCount += 1
                 
-            if avgCount > 0:
-                centerMass /= float(avgCount)
-                steeringForce = agent.seek(centerMass)
+        if avgCount > 0:
+            centerMass /= float(avgCount)
+            steeringForce = self.seek(centerMass)
         return steeringForce
         

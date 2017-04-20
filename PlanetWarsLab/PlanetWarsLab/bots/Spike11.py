@@ -1,22 +1,13 @@
 from random import choice
+import uuid
 from entities import Entity, Fleet
 class Spike11(object):
     def update(self, gameinfo):
         
         if gameinfo.my_fleets:
-            for src in gameinfo.my_fleets.items():
-                for k in src:
-                    if type(k) is Fleet:
-                        print("fleets attack here")
-                        result = k.in_range(gameinfo.not_my_planets)
-                        if result.count > 0:       
-                            for dest in result:
-                                if int(k.num_ships) > int(dest.num_ships):
-                                    gameinfo.fleet_order(k,dest, int(k.num_ships))
+           
             return
-            
-
-        
+           
                              
         if gameinfo.my_planets and gameinfo.not_my_planets:
             dest = min(gameinfo.my_planets.values(), key = lambda p: p.num_ships)

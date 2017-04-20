@@ -132,7 +132,6 @@ class Fleet(Entity):
         
         if (not ignoredest) and (self.turns_remaining == 1) and (self.dest not in result):
             result.append(self.dest)
-            print("working:", result[0].id)
         return result
 
     def vision_range(self):

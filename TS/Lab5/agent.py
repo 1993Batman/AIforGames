@@ -124,8 +124,8 @@ class Agent(object):
 
     def flee(self, hunter_pos, speed, pursuit_speed):
         ''' move away from hunter position '''
-## add panic distance (second)
-## add flee calculations (first)
+        ## add panic distance (second)
+        ## add flee calculations (first)
         decel_rate = self.DECELERATION_SPEEDS[speed]
         flee_target = self.pos - hunter_pos
         dist = flee_target.length()
