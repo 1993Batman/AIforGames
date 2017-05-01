@@ -1,0 +1,12 @@
+   1: Player 1 launched 78 (left 27) ships from planet 2 to planet 22
+  11: Player 1 launched 52 (left 18) ships from planet 22 to planet 23
+  38: Player 1 launched 33 (left 11) ships from planet 23 to planet 16
+  46: Player 1 launched 26 (left 9) ships from planet 23 to planet 17
+  69: Player 1 launched 144 (left 48) ships from planet 22 to planet 18
+  81: Player 1 launched 63 (left 21) ships from planet 22 to planet 19
+  99: Player 1 launched 56 (left 19) ships from planet 22 to planet 8
+ 122: Player 1 launched 70 (left 24) ships from planet 19 to planet 9
+ 139: Player 1 launched 104 (left 35) ships from planet 22 to planet 20
+ 153: Player 1 launched 116 (left 39) ships from planet 8 to planet 21
+ 163: Player 1 launched 270 (left 90) ships from planet 23 to planet 3
+ 173: Player 1 launched 234 (left 79) ships from planet 18 to planet 4
