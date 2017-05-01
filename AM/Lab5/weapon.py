@@ -61,6 +61,7 @@ class Weapon(object):
         # limits?
         self.max_speed = 100.0 * scale
         self.max_force = 500.0
+        self.turnRate = 3
 
     def calculate(self):
         # reset the steering force
@@ -93,6 +94,8 @@ class Weapon(object):
                                         self.heading, self.side, self.scale)
         # draw it!
         egi.closed_shape(pts)
+
+        egi.cross(self.target_pos,10)
 
 
 
@@ -130,14 +133,14 @@ class Weapon(object):
         if target.vel != Vector2D(0,0) and self.target_pos is None:
             lookAheadTime = toTarget.length() / (self.max_speed + target.speed())
             # turn rate delay? dot product = 1 if ahead, -1 if behind.
-            lookAheadTime += (1 - self.heading.dot(target.pos))
+            lookAheadTime += (-1 - self.heading.dot(target.pos))*- self.turnRate
             # Seek the predicted location (using look-ahead time)  
             if randrange(1,10) <= self.BULLET_TYPE[self.gun_type]:
                 self.target_pos = target.pos + target.vel * lookAheadTime
             else:
                 if randrange(1,10) <= 5:
-                    self.target_pos = Vector2D(target.pos.x +50.0,target.pos.y +50.0)
+                    self.target_pos = Vector2D(target.pos.x +20.0,target.pos.y +20.0)
                 else:
-                    self.target_pos = Vector2D(target.pos.x -50.0,target.pos.y -50.0)
+                    self.target_pos = Vector2D(target.pos.x -20.0,target.pos.y -20.0)
             return self.seek(self.target_pos)
         return self.seek(self.target_pos)

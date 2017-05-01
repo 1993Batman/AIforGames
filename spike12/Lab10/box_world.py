@@ -215,7 +215,6 @@ class BoxWorld(object):
         self.target = None
         self.agents = []
         self.complete = False
-        
     
     def get_box_by_index(self, ix, iy):
         idx = (self.nx * iy) + ix
@@ -226,10 +225,8 @@ class BoxWorld(object):
         return self.boxes[idx] if idx < len(self.boxes) else None
 
     def update(self):
-        for agent in self.agents:
-            agent.calculate_trip()
-            agent.update()
-        pass
+        self.agents[0].update()
+        
 
     def draw(self):
         for box in self.boxes:
@@ -270,7 +267,8 @@ class BoxWorld(object):
                 for i in range(1,len(path)):
                     egi.line_by_pos(self.boxes[path[i-1]]._vc, self.boxes[path[i]]._vc)
                 egi.set_stroke(1)
-     
+                self.complete = True
+
 
     def resize(self, cx, cy):
         self.cx, self.cy = cx, cy # world size

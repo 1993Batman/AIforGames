@@ -5,7 +5,7 @@ class Spike11(object):
     def update(self, gameinfo):
         
         if gameinfo.my_fleets:
-           
+            
             return
            
                              

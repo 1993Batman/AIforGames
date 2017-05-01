@@ -16,6 +16,23 @@ from pyglet.text import Label
 
 from box_world import BoxWorld, search_modes, cfg
 from entity import Entity
+
+class BoxWorldScreenAdapter(object):
+
+    def __init__(self, game):
+        self.game = game
+
+
+    def draw(self):
+        for f in self.game.agents:
+            egi.dot(0,0,f.src,(0.0, 0.0, 0.0, 1))
+            egi.set_stroke(5)
+            egi.set_pen_color(None,"BLACK")
+    
+    def update(self,game):
+        self.game = game
+            
+
 class BoxWorldWindow(pyglet.window.Window):
 
     # Mouse mode indicates what the mouse "click" should do...
@@ -68,7 +85,7 @@ class BoxWorldWindow(pyglet.window.Window):
 
         # add the extra event handlers we need
         self.add_handers()
-
+        self.adapt = BoxWorldScreenAdapter(self.world)
         # search limit
         self.limit = 0 # unlimited.
 
@@ -103,6 +120,8 @@ class BoxWorldWindow(pyglet.window.Window):
                     self.world.reset_navgraph()
                     self.plan_path()
                     self._update_label('status','graph changed')
+
+        
 
 
         @self.event
@@ -157,12 +176,28 @@ class BoxWorldWindow(pyglet.window.Window):
                 self.limit = 0
                 self.plan_path()
                 self._update_label('status', 'limit=%d' % self.limit)
+            elif symbol == key.Z:
+                self.clear()
+                self.world.draw()
+                self.adapt.draw()
+                self.world.update()
+                self.adapt.update(self.world)
+                if self.world.agents[0].end is True:
+                    print("Great Success")
+                    self.world.agents.clear()
+                    path = self.world.path.path
+                    self.world.agents.append(Entity(self.world.boxes,path))
+                    self.clear()
+                    self.world.draw()
+                    self.adapt.draw()
+                    self.world.update()
+                    self.adapt.update(self.world)
 
     def plan_path(self):
         self.world.plan_path(search_modes[self.search_mode], self.limit)
         self._update_label('status', 'path planned')
         print(self.world.path.report(verbose=3))
-
+    
     def on_draw(self):
         self.clear()
         self.world.draw()
@@ -170,8 +205,10 @@ class BoxWorldWindow(pyglet.window.Window):
             self.fps_display.draw()
         for key, label in list(self.labels.items()):
             label.draw()
-
-
+        if self.world.complete is True:
+            if len(self.world.agents) is 0: 
+                path = self.world.path.path
+                self.world.agents.append(Entity(self.world.boxes,path))
 
 #==============================================================================
 
