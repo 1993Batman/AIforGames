@@ -1,0 +1,12 @@
+   1: Player 2 launched 78 (left 27) ships from planet 3 to planet 1
+   9: Player 2 launched 50 (left 17) ships from planet 3 to planet 1
+  17: Player 2 launched 42 (left 15) ships from planet 3 to planet 1
+  25: Player 2 launched 41 (left 14) ships from planet 3 to planet 2
+  41: Player 2 launched 70 (left 24) ships from planet 3 to planet 1
+  49: Player 2 launched 19 (left 45) ships from planet 3 to planet 1
+  57: Player 2 launched 63 (left 22) ships from planet 3 to planet 2
+  73: Player 2 launched 76 (left 26) ships from planet 3 to planet 1
+  81: Player 2 launched 49 (left 17) ships from planet 3 to planet 1
+  89: Player 2 launched 42 (left 15) ships from planet 3 to planet 1
+  97: Player 2 launched 41 (left 14) ships from planet 3 to planet 1
+ 105: Player 2 launched 40 (left 14) ships from planet 3 to planet 1
