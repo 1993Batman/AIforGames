@@ -121,7 +121,7 @@ class Player(object):
         '''
         # If source fleet splitting we'll need a new fleet_id else keep old one
         print(src_fleet.id)
-        
+        fleetid = src_fleet.id
         if num_ships < src_fleet.num_ships: 
             fleetid = uuid.uuid4() 
             print(fleetid)

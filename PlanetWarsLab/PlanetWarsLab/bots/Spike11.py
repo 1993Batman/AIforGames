@@ -5,7 +5,14 @@ class Spike11(object):
     def update(self, gameinfo):
         
         if gameinfo.my_fleets:
-            
+            src = gameinfo.my_fleets.values()
+            dest = gameinfo.not_my_planets.values()
+            for f in src:
+                for p in dest:
+                    if Entity.distance_to(f,p) < f.FLEET_RANGE and int(f.num_ships) > int(p.num_ships) and int(f.dest.num_ships) >int(p.num_ships):
+                        gameinfo.fleet_order(f,p,f.num_ships)
+                        break
+ 
             return
            
                              
