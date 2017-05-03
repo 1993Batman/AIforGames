@@ -32,7 +32,7 @@ class GameInfo(object):
         self.fleet_order = fleet_order
         self.planet_order = planet_order
         self.log = logger
-
+        self.orders_list = []
     def clear(self):
         # planets
         self.planets.clear()

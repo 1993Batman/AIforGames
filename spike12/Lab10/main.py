@@ -25,9 +25,9 @@ class BoxWorldScreenAdapter(object):
 
     def draw(self):
         for f in self.game.agents:
-            egi.dot(0,0,f.src,(0.0, 0.0, 0.0, 1))
-            egi.set_stroke(5)
-            egi.set_pen_color(None,"BLACK")
+            egi.circle(f.src,5,True)
+            egi.set_stroke(3)
+            egi.black_pen()
     
     def update(self,game):
         self.game = game
@@ -177,18 +177,8 @@ class BoxWorldWindow(pyglet.window.Window):
                 self.plan_path()
                 self._update_label('status', 'limit=%d' % self.limit)
             elif symbol == key.Z:
-                self.clear()
-                self.world.draw()
-                self.adapt.draw()
-                self.world.update()
-                self.adapt.update(self.world)
-                if self.world.agents[0].end is True:
-                    print("Great Success")
-                    self.world.agents.clear()
-                    path = self.world.path.path
-                    self.world.agents.append(Entity(self.world.boxes,path))
+                if len(self.world.agents) > 0:
                     self.clear()
-                    self.world.draw()
                     self.adapt.draw()
                     self.world.update()
                     self.adapt.update(self.world)

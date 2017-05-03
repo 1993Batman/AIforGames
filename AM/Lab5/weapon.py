@@ -133,7 +133,7 @@ class Weapon(object):
         if target.vel != Vector2D(0,0) and self.target_pos is None:
             lookAheadTime = toTarget.length() / (self.max_speed + target.speed())
             # turn rate delay? dot product = 1 if ahead, -1 if behind.
-            lookAheadTime += (-1 - self.heading.dot(target.pos))*- self.turnRate
+            lookAheadTime += (-2 - self.heading.dot(target.pos))*- self.turnRate
             # Seek the predicted location (using look-ahead time)  
             if randrange(1,10) <= self.BULLET_TYPE[self.gun_type]:
                 self.target_pos = target.pos + target.vel * lookAheadTime
