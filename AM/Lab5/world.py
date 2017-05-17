@@ -20,6 +20,7 @@ class World(object):
         self.bull_type = 'Tracer_Main'
         self.paused = True
         self.showinfo = True
+        self.auto_fire = False
 
     def update(self, delta):
         if not self.paused:

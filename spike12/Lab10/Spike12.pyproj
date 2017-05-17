@@ -49,6 +49,7 @@
     <Content Include="map1.txt" />
     <Content Include="map2.txt" />
     <Content Include="map3.txt" />
+    <Content Include="map4.txt" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

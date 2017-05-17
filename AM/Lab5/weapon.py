@@ -55,7 +55,7 @@ class Weapon(object):
             Point2D( 0.2,  0.0),
             Point2D(-.2, -0.1)
         ]
-        
+
         self.moving_speed = 'slow'
 
         # limits?
@@ -112,11 +112,10 @@ class Weapon(object):
     def coll_check(self, target):
         #check to see if you are within a certain distance of the target
         toTarget = target.pos - self.pos
-        if toTarget.length() < self.radius:
-            self.tagged = True
-            return Vector2D(0,0)
-        elif self.target_pos is not None:
+        self.heading.dot(target.heading)
+        if self.target_pos is not None:
             toTarget = self.target_pos - self.pos
+            
             if toTarget.length() < self.radius:
                 self.tagged = True
                 return Vector2D(0,0)
@@ -133,14 +132,16 @@ class Weapon(object):
         if target.vel != Vector2D(0,0) and self.target_pos is None:
             lookAheadTime = toTarget.length() / (self.max_speed + target.speed())
             # turn rate delay? dot product = 1 if ahead, -1 if behind.
-            lookAheadTime += (-2 - self.heading.dot(target.pos))*- self.turnRate
+            lookAheadTime += (1 - self.heading.dot(target.pos))* self.turnRate
+            print(lookAheadTime)
             # Seek the predicted location (using look-ahead time)  
             if randrange(1,10) <= self.BULLET_TYPE[self.gun_type]:
-                self.target_pos = target.pos + target.vel * lookAheadTime
+                self.target_pos = (target.pos + target.vel) - self.vel.normalise()
+                print(self.target_pos)
             else:
                 if randrange(1,10) <= 5:
-                    self.target_pos = Vector2D(target.pos.x +20.0,target.pos.y +20.0)
+                    self.target_pos = ((target.pos + target.vel) - self.vel.normalise()) + Vector2D(target.pos.x +50.0,target.pos.y +50.0)
                 else:
-                    self.target_pos = Vector2D(target.pos.x -20.0,target.pos.y -20.0)
+                    self.target_pos = ((target.pos + target.vel) - self.vel.normalise()) + Vector2D(target.pos.x -50.0,target.pos.y -50.0)
             return self.seek(self.target_pos)
         return self.seek(self.target_pos)

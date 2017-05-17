@@ -93,7 +93,7 @@ cfg = {
     'CENTER_ON': False,
     'BOXLINES_ON': False,
     'BOXUSED_ON': False,
-    'TREE_ON': True,
+    'TREE_ON': False,
     'PATH_ON': True,
 }
 
@@ -213,8 +213,7 @@ class BoxWorld(object):
         self.reset_navgraph()
         self.start = None
         self.target = None
-        self.agents = []
-        self.complete = False
+        
     
     def get_box_by_index(self, ix, iy):
         idx = (self.nx * iy) + ix
@@ -225,7 +224,7 @@ class BoxWorld(object):
         return self.boxes[idx] if idx < len(self.boxes) else None
 
     def update(self):
-        self.agents[0].update()
+        pass
         
 
     def draw(self):
@@ -267,7 +266,6 @@ class BoxWorld(object):
                 for i in range(1,len(path)):
                     egi.line_by_pos(self.boxes[path[i-1]]._vc, self.boxes[path[i]]._vc)
                 egi.set_stroke(1)
-                self.complete = True
 
 
     def resize(self, cx, cy):

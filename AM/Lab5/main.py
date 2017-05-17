@@ -37,6 +37,11 @@ def on_key_press(symbol, modifiers):
         world.prey[0].vel = Vector2D(0,0)
     elif symbol == KEY.S:
         world.bullets.append(Weapon(world,world.bull_type))
+    elif symbol == KEY.G:
+        if world.auto_fire is False:
+            world.auto_fire = True
+        else:
+            world.auto_fire = False
     elif symbol == KEY.Q:
         world.bull_type = 'Hanzo_Main'
     elif symbol == KEY.W:
@@ -96,6 +101,8 @@ if __name__ == '__main__':
                 world.bullets.remove(bull)
             elif bull.pos.x >= 900.00 or bull.pos.y >= 900.00:
                 world.bullets.remove(bull)
+        if world.auto_fire is True:
+            world.bullets.append(Weapon(world,world.bull_type))
         # swap the double buffer
         win.flip()
 

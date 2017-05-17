@@ -32,7 +32,7 @@ class GameInfo(object):
         self.fleet_order = fleet_order
         self.planet_order = planet_order
         self.log = logger
-        self.orders_list = []
+
     def clear(self):
         # planets
         self.planets.clear()
@@ -120,7 +120,6 @@ class Player(object):
             if it is done, but no guarantee - the game decides and enforces the rules.
         '''
         # If source fleet splitting we'll need a new fleet_id else keep old one
-        print(src_fleet.id)
         fleetid = src_fleet.id
         if num_ships < src_fleet.num_ships: 
             fleetid = uuid.uuid4() 

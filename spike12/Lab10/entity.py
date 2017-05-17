@@ -1,31 +1,40 @@
 from graphics import egi
 from math import sqrt
 class Entity(object): 
-    def __init__(self,boxes,path):
+    def __init__(self,boxes, path,mode):
         self.boxes = boxes
         self.path = path
         self.src = self.boxes[path[0]]._vc
         self.dest = self.boxes[path[1]]._vc
-        self.total_trip_length= 0
+        self.total_trip_length= self.distance_to(self.dest)
         self.progress = 0
-        self.turns_remaining = 0
-        self.calculate_trip()
+        self.turns_remaining = self.calculate_trip()
         self.end = False
+        self.mode = mode
+        
+    def update_entity(self,boxes,path,mode):
+        if self.mode is not mode:
+            self.mode = mode
+            self.boxes = boxes
+            self.path = path
+            self.src = self.boxes[path[0]]._vc
+            self.dest = self.boxes[path[1]]._vc
+            self.total_trip_length= self.distance_to(self.dest)
+            self.progress = 0
+            self.turns_remaining = self.calculate_trip()
+            self.end = False
 
     def calculate_trip(self):
         self.total_trip_length = self.distance_to(self.dest)
-        self.turns_remaining = self.total_trip_length - self.progress
-        return self.turns_remaining
+        return self.total_trip_length - self.progress
 
     def update_next_dest(self):
         self.src = self.dest
         for i in range(0 ,len(self.path)):
-            print(i)
             if self.distance_to(self.boxes[self.path[len(self.path)-1]]._vc) < 0.5:
                 self.end = True
                 print(self.end)
                 break
-
             if self.dest is self.boxes[self.path[i]]._vc:
                 self.dest = self.boxes[self.path[i + 1]]._vc
                 break
