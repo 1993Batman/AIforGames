@@ -35,7 +35,7 @@ class Agent(object):
         self.mode = mode
         # where am i and where am i going? random
         dir = radians(random()*360)
-        self.pos = Vector2D(100.00, 600.00)
+        self.pos = Vector2D(100.00, randrange(0.00, 600.00))
         self.vel = Vector2D()
         self.heading = Vector2D(sin(dir), cos(dir))
         self.side = self.heading.perp()

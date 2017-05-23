@@ -13,7 +13,7 @@ from world import World
 from agent import Agent, AGENT_MODES  # Agent with seek, arrive, flee and pursuit
 from target import Target, AGENT_MODES 
 from weapon import Weapon
-
+from random import randrange
 
 
 def on_mouse_press(x, y, button, modifiers):
@@ -36,7 +36,10 @@ def on_key_press(symbol, modifiers):
         world.prey[0].move = False
         world.prey[0].vel = Vector2D(0,0)
     elif symbol == KEY.S:
-        world.bullets.append(Weapon(world,world.bull_type))
+        if world.prey[0].hit is False:
+            world.bullets.append(Weapon(world,world.bull_type))
+    elif symbol == KEY.D:
+        world.agents[0].pos.y = randrange(0.00, 800.00)
     elif symbol == KEY.G:
         if world.auto_fire is False:
             world.auto_fire = True
@@ -50,9 +53,6 @@ def on_key_press(symbol, modifiers):
         world.bull_type = 'Ana_Main'
     elif symbol == KEY.R:
         world.bull_type = 'Symmetra_Main'
-    elif symbol == KEY.I:
-        for agent in world.agents:
-            agent.show_info = not agent.show_info
     elif symbol == KEY.H:
         world.bullets.clear()
 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     world.prey.append(Target(world))
     # unpause the world ready for movement
     world.paused = False
-
+    i = 0
     while not win.has_exit:
         win.dispatch_events()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -101,8 +101,14 @@ if __name__ == '__main__':
                 world.bullets.remove(bull)
             elif bull.pos.x >= 900.00 or bull.pos.y >= 900.00:
                 world.bullets.remove(bull)
-        if world.auto_fire is True:
+        if world.auto_fire is True and world.prey[0].hit is False:
             world.bullets.append(Weapon(world,world.bull_type))
+        for t in world.prey:
+            if i < 100:
+                i+=1
+            else:
+                t.hit = False
+                i = 0
         # swap the double buffer
         win.flip()
 

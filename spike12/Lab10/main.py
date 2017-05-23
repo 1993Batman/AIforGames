@@ -15,22 +15,6 @@ from pyglet.gl import *
 from pyglet.text import Label
 
 from box_world import BoxWorld, search_modes, cfg
-from entity import Entity
-
-class BoxWorldScreenAdapter(object):
-
-    def __init__(self, agents):
-        self.agents = agents
-
-
-    def draw(self):
-        for f in self.agents:
-            egi.circle(f.src,20,False)
-            egi.black_pen()
-    
-    def update(self,agents):
-        self.agents = agents
-            
 
 class BoxWorldWindow(pyglet.window.Window):
 
@@ -42,6 +26,7 @@ class BoxWorldWindow(pyglet.window.Window):
         key._4: 'wall',
         key._5: 'start',
         key._6: 'target',
+        key._7: 'item',
     }
     mouse_mode = 'wall'
 
@@ -71,52 +56,32 @@ class BoxWorldWindow(pyglet.window.Window):
         #filename = 'map2.txt'
         self.world = BoxWorld.FromFile(filename, self.get_size())
         self.world.reset_navgraph()
-        self.agents = []
+
         # prep the fps display and some labels
-        self.fps_display = clock.ClockDisplay()
-        self.fps = 0
-        self.set_fps(10)
+        self.fps_display = clock.ClockDisplay() # clock.ClockDisplay()
+        clock.schedule_interval(self.update, 1.0 / 30)
         clBlack = (0,0,0, 255)
         self.labels = {
             'mouse':  Label('', x=5, y=self.height-20, color=clBlack),
             'search': Label('', x=120, y=self.height-20, color=clBlack),
-            'status': Label('', x=300, y=self.height-20, color=clBlack),
+            'cost': Label('', x=300, y=self.height-20, color=clBlack),
         }
         self._update_label()
 
         # add the extra event handlers we need
         self.add_handers()
-        self.adapt = BoxWorldScreenAdapter(self.agents)
+
         # search limit
         self.limit = 0 # unlimited.
         self.plan_path()
 
-    def set_fps(self, fps):
-        self.fps = max(fps, 5)
-        clock.unschedule(self.update)
-        clock.schedule_interval(self.update, 1.0 / self.fps)
-
-    def update(self, args):
-        # gets called by the scheduler at the step_fps interval set
-        world = self.world
-        if world:
-            self.adapt.update(self.agents)
-            if len(self.agents) is 0: 
-                path = world.path.path
-                self.agents.append(Entity(world.boxes,path,self.search_mode))
-            if len(self.agents) is 1: 
-                self.adapt.draw()
-                if self.agents[0].end is True:
-                    path = world.path.path
-                    self.agents.clear()
-                
     def _update_label(self, key=None, text='---'):
         if key == 'mouse' or key is None:
             self.labels['mouse'].text = 'Kind: '+self.mouse_mode
         if key == 'search' or key is None:
             self.labels['search'].text = 'Search: '+ search_modes[self.search_mode]
-        if key == 'status' or key is None:
-            self.labels['status'].text = 'Status: '+ text
+        if key == 'cost' or key is None:
+            self.labels['cost'].text = 'Cost: '+ text
 
     def add_handers(self):
 
@@ -136,11 +101,17 @@ class BoxWorldWindow(pyglet.window.Window):
                         self.world.set_start(box.node.idx)
                     elif self.mouse_mode == 'target':
                         self.world.set_target(box.node.idx)
+                        self.search_mode = 1
+                        self.world.item = None
+                    elif self.mouse_mode == 'item':
+                        self.world.set_item(box.node.idx)
+                        self.search_mode = 0
                     else:
                         box.set_kind(self.mouse_mode)
                     self.world.reset_navgraph()
                     self.plan_path()
-                    self._update_label('status','graph changed')
+                    self._update_label('search')
+                    self._update_label('cost',self.world.path.path_cost)
 
 
         @self.event
@@ -152,22 +123,6 @@ class BoxWorldWindow(pyglet.window.Window):
 
                 #print 'mouse mode ', self.mouse_mode
             # Change search mode? (Algorithm)
-            elif symbol == key.M:
-                self.search_mode += 1
-                if self.search_mode >= len(search_modes):
-                    self.search_mode = 0
-                self.plan_path()
-                path = self.world.path.path
-                self.agents[0].update_entity(self.world.boxes,path,self.search_mode)
-                self._update_label('search')
-            elif symbol == key.N:
-                self.search_mode -= 1
-                if self.search_mode < 0:
-                    self.search_mode = len(search_modes)-1
-                self.plan_path()
-                path = self.world.path.path
-                self.agents[0].update_entity(self.world.boxes,path,self.search_mode)
-                self._update_label('search')
             # Plan a path using the current search mode?
             elif symbol == key.SPACE:
                 self.plan_path()
@@ -186,25 +141,42 @@ class BoxWorldWindow(pyglet.window.Window):
             elif symbol == key.T:
                 cfg['TREE_ON'] = not cfg['TREE_ON']
 
-        @self.event
-        def on_draw():
-            self.clear()
-            self.world.draw()
-            if self.fps_display:
-                self.fps_display.draw()
-            for key, label in list(self.labels.items()):
-                label.draw()
-            if len(self.agents) is 1:
-                for i in self.agents:
-                    i.update()
-                
+            elif symbol == key.UP:
+                self.limit += 1
+                self.plan_path()
+                self._update_label('status', 'limit=%d' % self.limit)
+            elif symbol == key.DOWN:
+                if self.limit-1 > 0:
+                    self.limit -= 1
+                    self.plan_path()
+                    self._update_label('status', 'limit=%d' % self.limit)
+            elif symbol == key._0:
+                self.limit = 0
+                self.plan_path()
+                self._update_label('status', 'limit=%d' % self.limit)
 
     def plan_path(self):
         self.world.plan_path(search_modes[self.search_mode], self.limit)
-        self._update_label('status', 'path planned')
+        self._update_label('codt', self.world.path.path_cost)
+        print(type(self.world.path.path_cost))
         print(self.world.path.report(verbose=3))
 
-        
+    def on_draw(self):
+        self.clear()
+        self.world.draw()
+        if self.fps_display:
+            self.fps_display.draw()
+        for key, label in list(self.labels.items()):
+            label.draw()
+
+    def update(self, args):
+        self.world.update()
+        if self.world.agents is not None:
+            if self.world.agents.end is True: 
+                self.world.agents.end = False
+                self.plan_path()
+
+
 
 #==============================================================================
 
@@ -213,8 +185,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         filename = sys.argv[1]
     else:
-        filename = "map2.txt"
+        filename = "map3.txt"
     window = BoxWorldWindow(filename)
     pyglet.app.run()
-
 

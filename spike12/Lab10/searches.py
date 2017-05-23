@@ -228,8 +228,8 @@ def SearchAStar(graph, source_idx, target_idx, limit):
 
 # A simple dictionary with string keys to each search class type.
 SEARCHES = {
-    'DFS': SearchDFS,
-    'BFS': SearchBFS,
+    #'DFS': SearchDFS,
+    #'BFS': SearchBFS,
     'Dijkstra': SearchDijkstra,
     'AStar': SearchAStar,
 }
@@ -246,11 +246,11 @@ if __name__ == '__main__':
     print(g.summary())
     print(g.get_adj_list_str())
     # try a Depth First Search
-    print('from 5 to 3 DFS:')
-    print(SearchDFS(g,5,3))
+    #print('from 5 to 3 DFS:')
+    #print(SearchDFS(g,5,3))
     # try a Breath First Search
-    print('from 5 to 3 BFS:')
-    print(SearchBFS(g,5,3))
+    #print('from 5 to 3 BFS:')
+    #print(SearchBFS(g,5,3))
 
     # test the priority queue...
     pq = PriorityQueue()

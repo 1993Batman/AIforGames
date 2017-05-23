@@ -44,9 +44,11 @@ class Target(object):
         self.scale = Vector2D(scale, scale)  # easy scaling of agent size
         self.acceleration = Vector2D()  # current steering force
         self.mass = mass
+        self.hit = False
+        self.hit_color = 'RED'
         # limits?
         # data for drawing this agent
-        self.color = 'BLUE'
+        self.color = 'GREEN'
         self.vehicle_shape = [
             Point2D(-1.0,  0.6),
             Point2D( 1.0,  0.0),
@@ -80,6 +82,11 @@ class Target(object):
     def update(self, delta):
         ''' update vehicle position and orientation '''
         force = self.calculate(delta)
+        if self.hit is True:
+            self.color = self.hit_color
+            force *= 0.5
+        else:
+            self.color = 'GREEN' 
         # new velocity
         self.vel += force * delta
         # check for limits of new velocity

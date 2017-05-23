@@ -95,8 +95,6 @@ class Weapon(object):
         # draw it!
         egi.closed_shape(pts)
 
-        egi.cross(self.target_pos,10)
-
 
 
     def speed(self):
@@ -115,8 +113,10 @@ class Weapon(object):
         self.heading.dot(target.heading)
         if self.target_pos is not None:
             toTarget = self.target_pos - self.pos
-            
-            if toTarget.length() < self.radius:
+            test = target.pos - self.pos
+            if test.length() < self.radius:
+                    target.hit = True
+            if toTarget.length() < self.radius or target.hit is True:
                 self.tagged = True
                 return Vector2D(0,0)
 
@@ -130,14 +130,9 @@ class Weapon(object):
                     self.target_pos = Vector2D(target.pos.x -100.0,target.pos.y -100.0)
             return self.seek(self.target_pos)
         if target.vel != Vector2D(0,0) and self.target_pos is None:
-            lookAheadTime = toTarget.length() / (self.max_speed + target.speed())
-            # turn rate delay? dot product = 1 if ahead, -1 if behind.
-            lookAheadTime += (1 - self.heading.dot(target.pos))* self.turnRate
-            print(lookAheadTime)
-            # Seek the predicted location (using look-ahead time)  
             if randrange(1,10) <= self.BULLET_TYPE[self.gun_type]:
                 self.target_pos = (target.pos + target.vel) - self.vel.normalise()
-                print(self.target_pos)
+                
             else:
                 if randrange(1,10) <= 5:
                     self.target_pos = ((target.pos + target.vel) - self.vel.normalise()) + Vector2D(target.pos.x +50.0,target.pos.y +50.0)

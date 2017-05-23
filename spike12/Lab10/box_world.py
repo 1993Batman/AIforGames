@@ -49,7 +49,7 @@ from pyglet.gl import *
 from point2d import Point2D
 from graph import SparseGraph, Node, Edge
 from searches import SEARCHES
-from math import hypot
+from math import *
 from entity import Entity
 
 box_kind = ['.','m','~','X']
@@ -118,6 +118,7 @@ class Box(object):
         self.marker_label = None
         # position using coordinates
         self.reposition(coords)
+
 
     def reposition(self, coords):
         # top, right, bottom, left
@@ -194,6 +195,8 @@ class Box(object):
                 self._reposition_labels()
             self.marker_label.draw()
 
+        
+
 
 class BoxWorld(object):
     '''A world made up of boxes. '''
@@ -213,7 +216,8 @@ class BoxWorld(object):
         self.reset_navgraph()
         self.start = None
         self.target = None
-        
+        self.item = None
+        self.agents= None
     
     def get_box_by_index(self, ix, iy):
         idx = (self.nx * iy) + ix
@@ -224,13 +228,14 @@ class BoxWorld(object):
         return self.boxes[idx] if idx < len(self.boxes) else None
 
     def update(self):
-        pass
+        if self.agents is not None:
+            self.agents.update()
         
 
     def draw(self):
         for box in self.boxes:
             box.draw()
-
+        
         if cfg['EDGES_ON']:
             egi.set_pen_color(name='LIGHT_BLUE')
             for node, edges in self.graph.edgelist.items():
@@ -266,6 +271,8 @@ class BoxWorld(object):
                 for i in range(1,len(path)):
                     egi.line_by_pos(self.boxes[path[i-1]]._vc, self.boxes[path[i]]._vc)
                 egi.set_stroke(1)
+            if self.agents is not None:
+                self.agents.draw()
 
 
     def resize(self, cx, cy):
@@ -373,6 +380,7 @@ class BoxWorld(object):
             self.start.marker = None
         self.start = self.boxes[idx]
         self.start.marker = 'S'
+        self.agents = Entity(self.start._vc.x, self.start._vc.y, self.boxes)
 
     def set_target(self, idx):
         '''Set the target box based on its index idx value. '''
@@ -385,14 +393,23 @@ class BoxWorld(object):
         self.target = self.boxes[idx]
         self.target.marker = 'T'
 
+    def set_item(self, idx):
+        if self.item is not None:
+            self.item.marker = None
+        self.item = self.boxes[idx]
+        self.item.marker = 'I'
+
     def plan_path(self, search, limit):
         '''Conduct a nav-graph search from the current world start node to the
         current target node, using a search method that matches the string
         specified in `search`.
         '''
         cls = SEARCHES[search]
-        self.path = cls(self.graph, self.start.idx, self.target.idx, limit)
-
+        if self.item is not None:
+            self.path = cls(self.graph, self.start.idx, self.item.idx, limit)
+        else:
+            self.path = cls(self.graph, self.start.idx, self.target.idx, limit)
+        self.agents.path = self.path.path
     @classmethod
     def FromFile(cls, filename, pixels=(500,500) ):
         '''Support a the construction of a BoxWorld map from a simple text file.
