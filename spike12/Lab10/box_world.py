@@ -71,7 +71,7 @@ edge_cost_matrix = [
     [None, None, None, None], # 'X <- NO edges to walls.
 ]
 
-min_edge_cost = 10 # must be min value for heuristic cost to work
+min_edge_cost = 5 # must be min value for heuristic cost to work
 
 def edge_cost(k1, k2):
     k1 = box_kind.index(k1)
@@ -93,7 +93,7 @@ cfg = {
     'CENTER_ON': False,
     'BOXLINES_ON': False,
     'BOXUSED_ON': False,
-    'TREE_ON': False,
+    'TREE_ON': True,
     'PATH_ON': True,
 }
 

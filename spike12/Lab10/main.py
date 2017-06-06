@@ -59,7 +59,7 @@ class BoxWorldWindow(pyglet.window.Window):
 
         # prep the fps display and some labels
         self.fps_display = clock.ClockDisplay() # clock.ClockDisplay()
-        clock.schedule_interval(self.update, 1.0 / 30)
+        clock.schedule_interval(self.update, 1.0 / 120)
         clBlack = (0,0,0, 255)
         self.labels = {
             'mouse':  Label('', x=5, y=self.height-20, color=clBlack),
@@ -81,7 +81,11 @@ class BoxWorldWindow(pyglet.window.Window):
         if key == 'search' or key is None:
             self.labels['search'].text = 'Search: '+ search_modes[self.search_mode]
         if key == 'cost' or key is None:
-            self.labels['cost'].text = 'Cost: '+ text
+            if self.world.path is None:
+                self.labels['cost'].text = 'Cost: '+ text
+            else:
+                    self.labels['cost'].text = 'Cost: '+ self.world.path.path_cost
+
 
     def add_handers(self):
 
@@ -101,11 +105,11 @@ class BoxWorldWindow(pyglet.window.Window):
                         self.world.set_start(box.node.idx)
                     elif self.mouse_mode == 'target':
                         self.world.set_target(box.node.idx)
-                        self.search_mode = 1
+                        self.search_mode = 0
                         self.world.item = None
                     elif self.mouse_mode == 'item':
                         self.world.set_item(box.node.idx)
-                        self.search_mode = 0
+                        self.search_mode = 1
                     else:
                         box.set_kind(self.mouse_mode)
                     self.world.reset_navgraph()
@@ -157,7 +161,7 @@ class BoxWorldWindow(pyglet.window.Window):
 
     def plan_path(self):
         self.world.plan_path(search_modes[self.search_mode], self.limit)
-        self._update_label('codt', self.world.path.path_cost)
+        self._update_label('cost', self.world.path.path_cost)
         print(type(self.world.path.path_cost))
         print(self.world.path.report(verbose=3))
 
@@ -185,7 +189,9 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         filename = sys.argv[1]
     else:
-        filename = "map3.txt"
+        filename = "map4.txt"
     window = BoxWorldWindow(filename)
     pyglet.app.run()
 
+
+        

@@ -11,15 +11,12 @@ from math import sin, cos, radians
 from random import random, randrange, uniform
 from path import Path
 from tkinter import Scale
-
+from hunter import Hunter
 
 AGENT_MODES = {
-    KEY._1: 'seek',
-    KEY._2: 'arrive_slow',
-    KEY._3: 'arrive_normal',
-    KEY._4: 'arrive_fast',
-    KEY._5: 'follow_path',
-    KEY._6: 'wander'
+    'wander': 15,
+    'seek': 0,
+    'flee': 0,
 }
 
 
@@ -33,11 +30,11 @@ class Agent(object):
         ### ADD 'normal' and 'fast' speeds here
     }
 
-    def __init__(self, world=None, scale=30.0, mass=1.0, mode='seek'):
+    def __init__(self, world=None, scale=30.0, mass=1.0, mode='wander'):
         # keep a reference to the world object
         self.world = world
         self.mode = mode
-        self.looped = False
+        self.tagged = False
         # where am i and where am i going? random
         dir = radians(random()*360)
         self.pos = Vector2D(randrange(world.cx), randrange(world.cy))
@@ -57,42 +54,29 @@ class Agent(object):
             Point2D(-1.0, -0.6)
         ]
         
-        self.path = Path()
-        self.randomise_path()
-        self.waypoint_threshold = 50.0
-        
-
         ### wander details
         self.wander_target = Vector2D(1,0)
         self.wander_dist =1.0 * scale
         self.wander_radius =1.0 * scale
         self.wander_jitter =10.0 * scale
         self.bRadius =scale
-            
-
+        self.BestHidingSpot = None
+        self.best_goal = []    
+        self.best_goal.append('wander')
         # limits?
         self.max_speed = 20.0 * scale
         self.max_force = 500.0
         ## max_force ??
 
-        # debug draw info?
-        self.show_info = False
-
     def calculate(self, delta):
         # reset the steering force
         mode = self.mode
-        if mode == 'seek':
-            force = self.seek(self.world.target)
-        elif mode == 'arrive_slow':
-            force = self.arrive(self.world.target, 'slow')
-        elif mode == 'arrive_normal':
-            force = self.arrive(self.world.target, 'normal')
-        elif mode == 'arrive_fast':
-            force = self.arrive(self.world.target, 'fast')
-        elif mode == 'follow_path':
-            force = self.follow_path()
-        elif mode == 'wander':
+        if mode == 'wander':
             force = self.wander(delta)
+        elif mode == 'seek':
+            force = self.arrive(self.world.target,'slow')
+        elif mode == 'flee':
+            force = self.flee(self.world.target,'fast',Vector2D())
         else:
             force = Vector2D()
         self.force = force
@@ -100,6 +84,18 @@ class Agent(object):
 
     def update(self, delta):
         ''' update vehicle position and orientation '''
+        self.check_agent_mode()
+
+        if self.best_goal[0] is 'seek':
+            self.mode = 'seek'
+        elif self.best_goal[0] is 'flee':
+            self.mode = 'flee'
+        else:
+            self.mode = 'wander'
+        
+        if len(self.best_goal) > 5:
+            self.best_goal.pop(0)
+            
         force = self.calculate(delta)
         # new velocity
         self.vel += force * delta
@@ -116,47 +112,15 @@ class Agent(object):
 
     def render(self, color=None):
         ''' Draw the triangle agent with color'''
-        # draw the path if it exists and the mode is follow
-        if self.mode == 'follow_path':
-            ## ...
-            self.path.render()
-            pass
+        if self.BestHidingSpot is not None:
+            egi.white_pen()
+            egi.cross(Vector2D(self.BestHidingSpot.x,self.BestHidingSpot.y), 5)
 
         egi.set_pen_color(name=self.color)
         pts = self.world.transform_points(self.vehicle_shape, self.pos,
                                         self.heading, self.side, self.scale)
         # draw it!
         egi.closed_shape(pts)
-
-        # draw wander info?
-        if self.mode == 'wander':
-            ## ...
-            # calculate the center of the wander circle in front of the agent
-            wnd_pos = Vector2D(self.wander_dist, 0)
-            wld_pos = self.world.transform_point(wnd_pos, self.pos, self.heading, self.side)
-            # draw the wander circle
-            egi.green_pen()
-            egi.circle(wld_pos, self.wander_radius)
-            # draw the wander target (little circle on the big circle)
-            egi.red_pen()
-            wnd_pos = (self.wander_target + Vector2D(self.wander_dist, 0))
-            wld_pos = self.world.transform_point(wnd_pos, self.pos, self.heading, self.side)
-            egi.circle(wld_pos, 3)
-            pass
-
-        # add some handy debug drawing info lines - force and velocity
-        if self.show_info:
-            s = 0.5 # <-- scaling factor
-            # force
-            egi.red_pen()
-            egi.line_with_arrow(self.pos, self.pos + self.force * s, 5)
-            # velocity
-            egi.grey_pen()
-            egi.line_with_arrow(self.pos, self.pos + self.vel * s, 5)
-            # net (desired) change
-            egi.white_pen()
-            egi.line_with_arrow(self.pos+self.vel * s, self.pos+ (self.force+self.vel) * s, 5)
-            egi.line_with_arrow(self.pos, self.pos+ (self.force+self.vel) * s, 5)
 
 
     def speed(self):
@@ -171,8 +135,8 @@ class Agent(object):
 
     def flee(self, hunter_pos, speed, pursuit_speed):
         ''' move away from hunter position '''
-## add panic distance (second)
-## add flee calculations (first)
+        ## add panic distance (second)
+        ## add flee calculations (first)
         decel_rate = self.DECELERATION_SPEEDS[speed]
         flee_target = self.pos - hunter_pos
         dist = flee_target.length()
@@ -207,21 +171,6 @@ class Agent(object):
             desired_vel = to_target * (speed / dist)
             return (desired_vel - self.vel)
         return Vector2D(0, 0)
-    
-    def randomise_path(self):
-        cx = self.world.cx
-        cy = self.world.cy
-        margin = min(cx,cy) * (1/6)
-        self.path.create_random_path(5, 0+margin,0+margin, self.world.cx - margin, self.world.cy - margin,self.looped)
-
-    def follow_path(self):
-        if (self.path.is_finished()) :
-            return self.arrive(self.world.target, 'slow')
-        else:
-            dist = self.path.current_pt() - self.pos
-            if dist.length() < self.waypoint_threshold:
-                self.path.inc_current_pt()
-            return self.seek(self.path.current_pt())
 
     def wander(self, delta):
         ''' Random wandering using a projected jitter circle. '''
@@ -242,3 +191,76 @@ class Agent(object):
         wld_target = self.world.transform_point(target, self.pos, self.heading, self.side)
         # and steer towards it
         return self.seek(wld_target) 
+
+        
+
+    def check_agent_mode(self):
+        if (self.pos -self.world.target).length() < 250:
+            AGENT_MODES['seek'] += 2
+            AGENT_MODES['wander'] -= 2
+        if (self.pos -self.world.target).length() < 10:
+            AGENT_MODES['seek'] = 0
+            AGENT_MODES['wander'] = 15
+            AGENT_MODES['flee'] = 50
+        if (self.pos -self.world.target).length() > 300:
+            AGENT_MODES['seek'] -= 5
+            AGENT_MODES['wander'] += 5
+            AGENT_MODES['flee'] = 0
+        
+        if (self.world.hunter[0].pos - self.pos).length() < self.world.hunter[0].radius:
+            AGENT_MODES['seek'] = 0
+            AGENT_MODES['wander'] = 15
+            AGENT_MODES['flee'] = 50
+        if (self.world.hunter[0].pos - self.pos).length() < 300:
+            AGENT_MODES['seek'] -= 3
+            AGENT_MODES['wander'] -= 3
+            AGENT_MODES['flee'] += 3
+
+
+        if (self.pos -self.world.target).length() < 250:
+            AGENT_MODES['seek'] += 2
+            AGENT_MODES['wander'] -= 2
+        if (self.pos -self.world.target).length() < 30:
+            AGENT_MODES['seek'] = 0
+            AGENT_MODES['wander'] = 15
+            AGENT_MODES['flee'] = 50
+        if (self.pos -self.world.target).length() > 300:
+            AGENT_MODES['seek'] -= 5
+            AGENT_MODES['wander'] += 5
+            AGENT_MODES['flee'] = 0
+
+        if AGENT_MODES['seek'] > 50:
+            AGENT_MODES['seek'] = 50
+        if AGENT_MODES['wander'] > 50:
+            AGENT_MODES['wander'] = 50
+        if AGENT_MODES['flee'] > 50:
+            AGENT_MODES['flee'] = 50
+
+        if AGENT_MODES['seek'] < 0:
+            AGENT_MODES['seek'] = 0
+        if AGENT_MODES['wander'] < 0:
+            AGENT_MODES['wander'] = 0
+        if AGENT_MODES['flee'] < 0:
+            AGENT_MODES['flee'] = 0
+
+        goal,goal_val = max(list(AGENT_MODES.items()), key=lambda item: item[1])
+        self.best_goal.append(goal)
+
+
+    def best_goals(self):
+        w= 0
+        s=0
+        f=0
+
+        for i in self.best_goal:
+            if i is 'wander':
+                w+=1
+            if i is 'seek':
+                s+=1
+            if i is 'flee':
+                f+=1
+
+
+        print('wander: ' , w)
+        print('seek: ' , s)
+        print('flee: ' , f)
